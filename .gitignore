@@ -25,6 +25,8 @@
 
 # Compiled MATLAB
 *.mex*
+# Matlab workfiles
+._*.m
 
 # build, distribute, and bins
 build
