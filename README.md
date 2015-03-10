@@ -4,6 +4,4 @@ Everything here is subject to change, including the history of this branch.
 
 Consider PR #2016 for reducing memory usage.
 
-Consider PR #2016 for reducing memory usage.
-
 See `future.sh` for details.
