@@ -1,4 +1,4 @@
-#include <climits>
+#include <limits>
 #include <vector>
 
 #include "caffe/blob.hpp"
@@ -26,7 +26,8 @@ void Blob<Dtype>::Reshape(const vector<int>& shape) {
   shape_.resize(shape.size());
   for (int i = 0; i < shape.size(); ++i) {
     CHECK_GE(shape[i], 0);
-    CHECK_LE(shape[i], INT_MAX / count_) << "blob size exceeds INT_MAX";
+    CHECK_LE(shape[i], std::numeric_limits<size_t>::max() / count_)
+        << "blob size exceeds " << std::numeric_limits<size_t>::max();
     count_ *= shape[i];
     shape_[i] = shape[i];
   }
@@ -476,12 +477,12 @@ void Blob<Dtype>::ToProto(BlobProto* proto, bool write_diff) const {
   proto->clear_data();
   proto->clear_diff();
   const Dtype* data_vec = cpu_data();
-  for (int i = 0; i < count_; ++i) {
+  for (size_t i = 0; i < count_; ++i) {
     proto->add_data(data_vec[i]);
   }
   if (write_diff) {
     const Dtype* diff_vec = cpu_diff();
-    for (int i = 0; i < count_; ++i) {
+    for (size_t i = 0; i < count_; ++i) {
       proto->add_diff(diff_vec[i]);
     }
   }
