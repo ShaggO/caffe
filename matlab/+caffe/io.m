@@ -29,5 +29,29 @@ classdef io
       CHECK_FILE_EXIST(mean_proto_file);
       mean_data = caffe_('read_mean', mean_proto_file);
     end
+    function im_data = transform(im_data, colour)
+      % im_data = transform(im_data, colour)
+      %   transform input data into caffe/matlab format (involutory
+      %   function/transformation)
+      %   If data isn't colour-coded, the colour flag should be set to 0 to
+      %   avoid shuffling the third channel. Colour is assumed by default.
+      %   returns im_data in either W x H x C with BGR channels
+      %   or H x W x C with RGB channels
+      if nargin < 2
+          colour = true;
+      end
+      if size(im_data,3) == 3 && colour
+        im_data = im_data(:,:,[3, 2, 1]);
+      end
+      im_data = permute(im_data, [2, 1, 3]);
+      im_data = single(im_data);
+    end
+    function im_size = transform_shape(im_size)
+      % im_size = transform_shape(im_size)
+      %   Transform shape definition according to the image transform
+      %   performed in caffe.io.transform
+      %   returns im_size in H x W x C
+      im_size = im_size([2, 1, 3]);
+    end
   end
 end
