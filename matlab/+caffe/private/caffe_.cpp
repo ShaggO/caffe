@@ -445,6 +445,20 @@ static void set_device(MEX_ARGS) {
   Caffe::SetDevice(device_id);
 }
 
+static bool log_initialized = false;
+
+// Usage: caffe_('set_logfile', file_name)
+static void set_logfile(MEX_ARGS) {
+  mxCHECK(nrhs == 1 && mxIsChar(prhs[0]),
+      "Usage: caffe_('set_logfile', file_name)");
+  char* log_file = mxArrayToString(prhs[0]);
+  Caffe::SetLogfile(log_file);
+  if (!log_initialized) {
+      Caffe::InitLogging();
+      log_initialized = true;
+  }
+}
+
 // Usage: caffe_('get_init_key')
 static void get_init_key(MEX_ARGS) {
   mxCHECK(nrhs == 0, "Usage: caffe_('get_init_key')");
@@ -512,6 +526,7 @@ static handler_registry handlers[] = {
   { "set_mode_cpu",       set_mode_cpu    },
   { "set_mode_gpu",       set_mode_gpu    },
   { "set_device",         set_device      },
+  { "set_logfile",        set_logfile     },
   { "get_init_key",       get_init_key    },
   { "reset",              reset           },
   { "read_mean",          read_mean       },
