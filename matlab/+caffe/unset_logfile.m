@@ -16,18 +16,31 @@ else
     PID = feature('getpid');
     logs = dir(sprintf('%s*%i',file_name,PID));
 end
-offset = numel(file_name)+1;
+[fPath,fName,fExt] = fileparts(file_name);
+assert(numel(logs) > 0, ['No log found. Checking for all PIDS: ' log2str(allPids)]);
+offset = numel([fName fExt])+1;
 val = -Inf;
 idx = 0;
 % Find newest entry
 for i = 1:numel(logs)
+    logs(i).name(offset)
     nVal = str2double(logs(i).name([offset:offset+7, offset+9:offset+14]));
     if nVal > val
         val = nVal;
         idx = i;
     end
 end
-copyfile(logs(idx).name,file_name);
-delete(logs(idx).name);
+copyfile([fPath '/' logs(idx).name],file_name);
+delete([fPath '/' logs(idx).name]);
+
+end
+
+function str = log2str(val)
+assert(islogical(val),'Input value must be logical');
+if val
+    str = 'Yes';
+else
+    str = 'No';
+end
 
 end
