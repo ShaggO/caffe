@@ -53,5 +53,13 @@ classdef io
       %   returns im_size in H x W x C
       im_size = im_size([2, 1, 3]);
     end
+    function write_mean(mean_data, mean_proto_file)
+      % write_mean(mean_data, mean_proto_file)
+      %   write image mean data to binaryproto file
+      %   mean_data should be W x H x C with BGR channels
+      CHECK(ischar(mean_proto_file), 'mean_proto_file must be a string');
+      CHECK(isa(mean_data, 'single'), 'mean_data must be a SINGLE matrix');
+      caffe_('write_mean', mean_data, mean_proto_file);
+    end   
   end
 end
