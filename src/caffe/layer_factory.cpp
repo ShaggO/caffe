@@ -59,6 +59,11 @@ shared_ptr<Layer<Dtype> > GetPoolingLayer(const LayerParameter& param) {
                 << "Using Caffe's own pooling layer.";
       return shared_ptr<Layer<Dtype> >(new PoolingLayer<Dtype>(param));
     }
+    if (param.pooling_param().pool() == PoolingParameter_PoolMethod_STOCHASTIC) {
+      LOG(INFO) << "cuDNN does not support stochastic pooling. "
+                << "Using Caffe's own pooling layer.";
+      return shared_ptr<Layer<Dtype> >(new PoolingLayer<Dtype>(param));
+    }
     return shared_ptr<Layer<Dtype> >(new CuDNNPoolingLayer<Dtype>(param));
 #endif
   } else {
