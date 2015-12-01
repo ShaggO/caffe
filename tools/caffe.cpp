@@ -13,7 +13,7 @@ namespace bp = boost::python;
 #include "boost/algorithm/string.hpp"
 #include "caffe/caffe.hpp"
 #include "caffe/data_layers.hpp"
-#include "caffe/util/signal_handler.h"
+//#include "caffe/util/signal_handler.h"
 
 using caffe::Blob;
 using caffe::Caffe;
@@ -193,16 +193,16 @@ int train() {
     Caffe::set_mode(Caffe::GPU);
     Caffe::set_solver_count(gpus.size());
   }
-
+  /*
   caffe::SignalHandler signal_handler(
         GetRequestedAction(FLAGS_sigint_effect),
         GetRequestedAction(FLAGS_sighup_effect));
-
+  */
   shared_ptr<caffe::Solver<float> >
       solver(caffe::SolverRegistry<float>::CreateSolver(solver_param));
-
+  /*
   solver->SetActionFunction(signal_handler.GetActionFunction());
-
+  */
   if (FLAGS_snapshot.size()) {
     LOG(INFO) << "Resuming from " << FLAGS_snapshot;
     solver->Restore(FLAGS_snapshot.c_str());

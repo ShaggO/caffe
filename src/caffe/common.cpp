@@ -34,6 +34,7 @@ int64_t cluster_seedgen(void) {
     fclose(f);
 
   pid = getpid();
+
   s = time(NULL);
   seed = std::abs(((s * 181) * ((pid - 83) * 359)) % 104729);
   return seed;
@@ -46,7 +47,8 @@ void GlobalInit(int* pargc, char*** pargv) {
   // Google logging.
   ::google::InitGoogleLogging(*(pargv)[0]);
   // Provide a backtrace on segfault.
-  ::google::InstallFailureSignalHandler();
+  // Signal Handler not supported by windows in this windows port
+  //::google::InstallFailureSignalHandler();
 }
 
 #ifdef CPU_ONLY  // CPU-only Caffe.
