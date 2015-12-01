@@ -12,6 +12,7 @@ namespace bp = boost::python;
 
 #include "boost/algorithm/string.hpp"
 #include "caffe/caffe.hpp"
+#include "caffe/data_layers.hpp"
 #include "caffe/util/signal_handler.h"
 
 using caffe::Blob;
@@ -40,6 +41,10 @@ DEFINE_string(weights, "",
     "separated by ','. Cannot be set simultaneously with snapshot.");
 DEFINE_int32(iterations, 50,
     "The number of iterations to run.");
+DEFINE_string(i, "",
+  "Optional; the location of the image to perform prediction on.");
+DEFINE_string(o, "",
+  "Optional; the location of the predicted output image.");
 DEFINE_string(sigint_effect, "stop",
              "Optional; action to take when a SIGINT signal is received: "
               "snapshot, stop or none.");
