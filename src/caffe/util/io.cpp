@@ -155,7 +155,9 @@ bool ReadFileToDatum(const string& filename, const int label,
     file.close();
     datum->set_data(buffer);
     datum->set_label(label);
-    datum->set_encoded(true);
+    #ifdef USE_OPENCV
+      datum->set_encoded(true);
+    #endif
     return true;
   } else {
     return false;
