@@ -189,6 +189,27 @@ inline bool ParamSpec_DimCheckMode_Parse(
   return ::google::protobuf::internal::ParseNamedEnum<ParamSpec_DimCheckMode>(
     ParamSpec_DimCheckMode_descriptor(), name, value);
 }
+enum LossParameter_NormalizationMode {
+  LossParameter_NormalizationMode_FULL = 0,
+  LossParameter_NormalizationMode_VALID = 1,
+  LossParameter_NormalizationMode_BATCH_SIZE = 2,
+  LossParameter_NormalizationMode_NONE = 3
+};
+bool LossParameter_NormalizationMode_IsValid(int value);
+const LossParameter_NormalizationMode LossParameter_NormalizationMode_NormalizationMode_MIN = LossParameter_NormalizationMode_FULL;
+const LossParameter_NormalizationMode LossParameter_NormalizationMode_NormalizationMode_MAX = LossParameter_NormalizationMode_NONE;
+const int LossParameter_NormalizationMode_NormalizationMode_ARRAYSIZE = LossParameter_NormalizationMode_NormalizationMode_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* LossParameter_NormalizationMode_descriptor();
+inline const ::std::string& LossParameter_NormalizationMode_Name(LossParameter_NormalizationMode value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    LossParameter_NormalizationMode_descriptor(), value);
+}
+inline bool LossParameter_NormalizationMode_Parse(
+    const ::std::string& name, LossParameter_NormalizationMode* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<LossParameter_NormalizationMode>(
+    LossParameter_NormalizationMode_descriptor(), name, value);
+}
 enum ConvolutionParameter_Engine {
   ConvolutionParameter_Engine_DEFAULT = 0,
   ConvolutionParameter_Engine_CAFFE = 1,
@@ -3453,6 +3474,32 @@ class LossParameter : public ::google::protobuf::Message {
 
   // nested types ----------------------------------------------------
 
+  typedef LossParameter_NormalizationMode NormalizationMode;
+  static const NormalizationMode FULL = LossParameter_NormalizationMode_FULL;
+  static const NormalizationMode VALID = LossParameter_NormalizationMode_VALID;
+  static const NormalizationMode BATCH_SIZE = LossParameter_NormalizationMode_BATCH_SIZE;
+  static const NormalizationMode NONE = LossParameter_NormalizationMode_NONE;
+  static inline bool NormalizationMode_IsValid(int value) {
+    return LossParameter_NormalizationMode_IsValid(value);
+  }
+  static const NormalizationMode NormalizationMode_MIN =
+    LossParameter_NormalizationMode_NormalizationMode_MIN;
+  static const NormalizationMode NormalizationMode_MAX =
+    LossParameter_NormalizationMode_NormalizationMode_MAX;
+  static const int NormalizationMode_ARRAYSIZE =
+    LossParameter_NormalizationMode_NormalizationMode_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  NormalizationMode_descriptor() {
+    return LossParameter_NormalizationMode_descriptor();
+  }
+  static inline const ::std::string& NormalizationMode_Name(NormalizationMode value) {
+    return LossParameter_NormalizationMode_Name(value);
+  }
+  static inline bool NormalizationMode_Parse(const ::std::string& name,
+      NormalizationMode* value) {
+    return LossParameter_NormalizationMode_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   // optional int32 ignore_label = 1;
@@ -3462,7 +3509,14 @@ class LossParameter : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 ignore_label() const;
   inline void set_ignore_label(::google::protobuf::int32 value);
 
-  // optional bool normalize = 2 [default = true];
+  // optional .caffe.LossParameter.NormalizationMode normalization = 3 [default = VALID];
+  inline bool has_normalization() const;
+  inline void clear_normalization();
+  static const int kNormalizationFieldNumber = 3;
+  inline ::caffe::LossParameter_NormalizationMode normalization() const;
+  inline void set_normalization(::caffe::LossParameter_NormalizationMode value);
+
+  // optional bool normalize = 2;
   inline bool has_normalize() const;
   inline void clear_normalize();
   static const int kNormalizeFieldNumber = 2;
@@ -3473,6 +3527,8 @@ class LossParameter : public ::google::protobuf::Message {
  private:
   inline void set_has_ignore_label();
   inline void clear_has_ignore_label();
+  inline void set_has_normalization();
+  inline void clear_has_normalization();
   inline void set_has_normalize();
   inline void clear_has_normalize();
 
@@ -3481,6 +3537,7 @@ class LossParameter : public ::google::protobuf::Message {
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   ::google::protobuf::int32 ignore_label_;
+  int normalization_;
   bool normalize_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
@@ -14864,18 +14921,43 @@ inline void LossParameter::set_ignore_label(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:caffe.LossParameter.ignore_label)
 }
 
-// optional bool normalize = 2 [default = true];
-inline bool LossParameter::has_normalize() const {
+// optional .caffe.LossParameter.NormalizationMode normalization = 3 [default = VALID];
+inline bool LossParameter::has_normalization() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void LossParameter::set_has_normalize() {
+inline void LossParameter::set_has_normalization() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void LossParameter::clear_has_normalize() {
+inline void LossParameter::clear_has_normalization() {
   _has_bits_[0] &= ~0x00000002u;
 }
+inline void LossParameter::clear_normalization() {
+  normalization_ = 1;
+  clear_has_normalization();
+}
+inline ::caffe::LossParameter_NormalizationMode LossParameter::normalization() const {
+  // @@protoc_insertion_point(field_get:caffe.LossParameter.normalization)
+  return static_cast< ::caffe::LossParameter_NormalizationMode >(normalization_);
+}
+inline void LossParameter::set_normalization(::caffe::LossParameter_NormalizationMode value) {
+  assert(::caffe::LossParameter_NormalizationMode_IsValid(value));
+  set_has_normalization();
+  normalization_ = value;
+  // @@protoc_insertion_point(field_set:caffe.LossParameter.normalization)
+}
+
+// optional bool normalize = 2;
+inline bool LossParameter::has_normalize() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void LossParameter::set_has_normalize() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void LossParameter::clear_has_normalize() {
+  _has_bits_[0] &= ~0x00000004u;
+}
 inline void LossParameter::clear_normalize() {
-  normalize_ = true;
+  normalize_ = false;
   clear_has_normalize();
 }
 inline bool LossParameter::normalize() const {
@@ -22762,6 +22844,11 @@ template <> struct is_proto_enum< ::caffe::ParamSpec_DimCheckMode> : ::google::p
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::caffe::ParamSpec_DimCheckMode>() {
   return ::caffe::ParamSpec_DimCheckMode_descriptor();
+}
+template <> struct is_proto_enum< ::caffe::LossParameter_NormalizationMode> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::caffe::LossParameter_NormalizationMode>() {
+  return ::caffe::LossParameter_NormalizationMode_descriptor();
 }
 template <> struct is_proto_enum< ::caffe::ConvolutionParameter_Engine> : ::google::protobuf::internal::true_type {};
 template <>
