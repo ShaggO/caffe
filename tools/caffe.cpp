@@ -12,7 +12,7 @@ namespace bp = boost::python;
 
 #include "boost/algorithm/string.hpp"
 #include "caffe/caffe.hpp"
-#include "caffe/data_layers.hpp"
+#include "caffe/layers/memory_data_layer.hpp"
 #include "caffe/util/signal_handler.h"
 
 using caffe::Blob;
@@ -318,8 +318,8 @@ int predict() {
   caffe::Datum image;
   caffe::ReadFileToDatum(FLAGS_i, 1, &image);
 
-  shared_ptr<caffe::MemoryDataLayer<float>> md_layer =
-    boost::dynamic_pointer_cast <caffe::MemoryDataLayer<float>>(caffe_net.layers()[0]);
+  shared_ptr<caffe::MemoryDataLayer<float> > md_layer =
+    boost::dynamic_pointer_cast <caffe::MemoryDataLayer<float> >(caffe_net.layers()[0]);
   if (!md_layer) {
     LOG(INFO) << "The first layer is not a MemoryDataLayer!\n";
     return -1;
@@ -338,7 +338,7 @@ int predict() {
 
   caffe_net.Forward(vector<Blob<float>*>(),&loss);
   //LOG(INFO) << "loss: " << loss << "\n";
-  shared_ptr<Blob<float>> prob = caffe_net.blob_by_name("prob");
+  shared_ptr<Blob<float> > prob = caffe_net.blob_by_name("prob");
   caffe::WriteToBinaryFile(FLAGS_o, prob->cpu_data(), prob->count());
 
   return 0;
