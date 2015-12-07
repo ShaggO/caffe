@@ -380,6 +380,58 @@ static void blob_get_shape(MEX_ARGS) {
   plhs[0] = mx_shape;
 }
 
+// Usage: caffe_('net_test', net, iters)
+static void net_test(MEX_ARGS) {
+  mxCHECK(nrhs == 2 && mxIsStruct(prhs[0]) && mxIsDouble(prhs[1]),
+      "Usage: caffe_('net_test', net, iters)");
+  Net<float>* net = handle_to_ptr<Net<float> >(prhs[0]);
+  int iters = mxGetScalar(prhs[1]);
+
+  vector<Blob<float>* > bottom_vec;
+  vector<int> test_score_output_id;
+  vector<float> test_score;
+  float loss = 0.0;
+  for(int i = 0; i < iters; ++i) {
+    float iter_loss = 0.0;
+    const vector<Blob<float>*>& result =
+        net->Forward(bottom_vec, &iter_loss);
+    loss += iter_loss;
+    int idx = 0;
+    for (int j = 0; j < result.size(); ++j) {
+      const float* result_vec = result[j]->cpu_data();
+      for (int k = 0; k < result[j]->count(); ++k, ++idx) {
+        const float score = result_vec[k];
+        if (i == 0) {
+          test_score.push_back(score);
+          test_score_output_id.push_back(j);
+        } else {
+          test_score[idx] += score;
+        }
+        const std::string& output_name = net->blob_names()[
+            net->output_blob_indices()[j]];
+        LOG(INFO) << "Batch " << i << ", " << output_name << " = " << score;
+      }
+    }
+  }
+  loss /= iters;
+  LOG(INFO) << "Loss: " << loss;
+  plhs[0] = mxCreateDoubleMatrix(test_score.size(),1, mxREAL);
+  double* mean_score = mxGetPr(plhs[0]);
+  for (int i = 0; i < test_score.size(); ++i) {
+    const std::string& output_name = net->blob_names()[
+        net->output_blob_indices()[test_score_output_id[i]]];
+    const float loss_weight = net->blob_loss_weights()[
+        net->output_blob_indices()[test_score_output_id[i]]];
+    std::ostringstream loss_msg_stream;
+    mean_score[i] = test_score[i] / iters;
+    if (loss_weight) {
+      loss_msg_stream << " (* " << loss_weight
+                      << " = " << loss_weight * mean_score[i] << " loss)";
+    }
+    LOG(INFO) << output_name << " = " << mean_score[i] << loss_msg_stream.str();
+  }
+}
+
 // Usage: caffe_('blob_reshape', hBlob, new_shape)
 static void blob_reshape(MEX_ARGS) {
   mxCHECK(nrhs == 2 && mxIsStruct(prhs[0]) && mxIsDouble(prhs[1]),
@@ -541,6 +593,7 @@ static handler_registry handlers[] = {
   { "net_copy_from",      net_copy_from   },
   { "net_reshape",        net_reshape     },
   { "net_save",           net_save        },
+  { "net_test",           net_test        },
   { "layer_get_attr",     layer_get_attr  },
   { "layer_get_type",     layer_get_type  },
   { "blob_get_shape",     blob_get_shape  },
