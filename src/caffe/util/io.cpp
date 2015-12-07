@@ -165,7 +165,7 @@ bool ReadFileToDatum(const string& filename, const int label,
 }
 
 bool WriteToBinaryFile(const string& filename, const float* data, int number_of_floats) {
-  fstream output_file(filename, ios::out | ios::binary);
+  fstream output_file(filename.c_str(), ios::out|ios::binary);
   if (output_file.is_open()) {
     output_file.write((char*)data, sizeof(float)*number_of_floats);
     output_file.close();
