@@ -390,6 +390,7 @@ static void net_test(MEX_ARGS) {
   vector<Blob<float>* > bottom_vec;
   vector<int> test_score_output_id;
   vector<float> test_score;
+  LOG(INFO) << "Full dataset test:";
   float loss = 0.0;
   for(int i = 0; i < iters; ++i) {
     float iter_loss = 0.0;
@@ -407,9 +408,9 @@ static void net_test(MEX_ARGS) {
         } else {
           test_score[idx] += score;
         }
-        const std::string& output_name = net->blob_names()[
-            net->output_blob_indices()[j]];
-        LOG(INFO) << "Batch " << i << ", " << output_name << " = " << score;
+        //const std::string& output_name = net->blob_names()[
+        //    net->output_blob_indices()[j]];
+        //LOG(INFO) << "Batch " << i << ", " << output_name << " = " << score;
       }
     }
   }
