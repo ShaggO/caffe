@@ -13,7 +13,6 @@ namespace bp = boost::python;
 #include "boost/algorithm/string.hpp"
 #include "caffe/caffe.hpp"
 #include "caffe/layers/memory_data_layer.hpp"
-#include "caffe/data_layers.hpp"
 //#include "caffe/util/signal_handler.h"
 
 using caffe::Blob;
