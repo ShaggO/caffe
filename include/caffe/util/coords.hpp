@@ -46,6 +46,17 @@ class DiagonalAffineMap {
 };
 
 template <typename Dtype>
+DiagonalAffineMap<Dtype> FilterMap(const int* kernel_shape, const int* stride, const int* pad, const int* dilation, const int axes) {
+  vector<pair<Dtype, Dtype> > coefs;
+  for (int i=0; i < axes; ++i) {
+    coefs.push_back(make_pair(stride[i],
+        static_cast<Dtype>(dilation[i] * (kernel_shape[i] - 1)) / 2 - pad[i]));
+    // Coeffs: (scale,crop)
+  }
+  return DiagonalAffineMap<Dtype>(coefs);
+}
+
+template <typename Dtype>
 DiagonalAffineMap<Dtype> FilterMap(const int kernel_h, const int kernel_w,
     const int stride_h, const int stride_w, const int pad_h, const int pad_w) {
   vector<pair<Dtype, Dtype> > coefs;
