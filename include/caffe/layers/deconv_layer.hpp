@@ -35,7 +35,7 @@ class DeconvolutionLayer : public BaseConvolutionLayer<Dtype> {
   virtual inline DiagonalAffineMap<Dtype> coord_map() {
     return FilterMap<Dtype>(this->kernel_shape_.cpu_data(),
             this->stride_.cpu_data(),this->pad_.cpu_data(),
-            this->dilation_.cpu_data(),this->num_spatial_axes_).inv();
+            this->dilation_.cpu_data(),this->num_spatial_axes_);
   }
 
  protected:
