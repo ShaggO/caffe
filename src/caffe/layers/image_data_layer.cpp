@@ -15,6 +15,7 @@
 #include "caffe/util/math_functions.hpp"
 #include "caffe/util/rng.hpp"
 #include "boost/algorithm/string.hpp"
+#include "boost/lexical_cast.hpp"
 
 namespace caffe {
 
@@ -48,7 +49,7 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       filename = line.substr(0,pos);
       label_t = line.substr(pos);
       boost::trim(label_t);
-      label = std::stoi(label_t);
+      label = boost::lexical_cast<int>(label_t);
       lines_.push_back(std::make_pair(filename, label));
     }
   } else {
