@@ -14,6 +14,7 @@
 #include "caffe/util/io.hpp"
 #include "caffe/util/math_functions.hpp"
 #include "caffe/util/rng.hpp"
+#include "boost/algorithm/string.hpp"
 
 namespace caffe {
 
@@ -37,11 +38,23 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   const string& source = this->layer_param_.image_data_param().source();
   LOG(INFO) << "Opening file " << source;
   std::ifstream infile(source.c_str());
-  string filename;
-  int label;
-  while (infile >> filename >> label) {
-    lines_.push_back(std::make_pair(filename, label));
+  if (infile.is_open()) {
+    std::string line;
+    int label;
+    string filename;
+    std::string label_t;
+    while (std::getline(infile,line)) {
+      std::size_t pos = line.find_last_of(" \t\f\v\n\r");
+      filename = line.substr(0,pos);
+      label_t = line.substr(pos);
+      boost::trim(label_t);
+      label = std::stoi(label_t);
+      lines_.push_back(std::make_pair(filename, label));
+    }
+  } else {
+    LOG(FATAL) << "Failed to open source file: " << source;
   }
+  infile.close();
 
   if (this->layer_param_.image_data_param().shuffle()) {
     // randomly shuffle data
