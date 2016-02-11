@@ -26,6 +26,9 @@ class ConcatLayer : public Layer<Dtype> {
   virtual inline const char* type() const { return "Concat"; }
   virtual inline int MinBottomBlobs() const { return 1; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
+  virtual inline DiagonalAffineMap<Dtype> coord_map() {
+    return DiagonalAffineMap<Dtype>::identity(2);
+  }
 
  protected:
   /**
