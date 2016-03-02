@@ -306,7 +306,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 144 (last added: input_param)
+// LayerParameter next available layer-specific ID: 145 (last added: meaniu_param)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -375,6 +375,7 @@ message LayerParameter {
   optional InfogainLossParameter infogain_loss_param = 116;
   optional InnerProductParameter inner_product_param = 117;
   optional InputParameter input_param = 143;
+  optional MeanIUParameter meaniu_param = 144;
   optional LogParameter log_param = 134;
   optional LRNParameter lrn_param = 118;
   optional MemoryDataParameter memory_data_param = 119;
@@ -465,6 +466,18 @@ message AccuracyParameter {
 
   // If specified, ignore instances with the given label.
   optional int32 ignore_label = 3;
+}
+
+message MeanIUParameter {
+  // The "label" axis of the prediction blob, whose argmax corresponds to the
+  // predicted label -- may be negative to index from the end (e.g., -1 for the
+  // last axis).  For example, if axis == 1 and the predictions are
+  // (N x C x H x W), the label blob is expected to contain N*H*W ground truth
+  // labels with integer values in {0, 1, ..., C-1}.
+  optional int32 axis = 1 [default = 1];
+
+  // If specified, ignore instances with the given label.
+  optional int32 ignore_label = 2;
 }
 
 message ArgMaxParameter {
