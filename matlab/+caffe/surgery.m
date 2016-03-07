@@ -10,6 +10,23 @@ classdef surgery
       % equal.
       % Enumerate the names of the IP layers and Conv layers in
       % inputs
+      if nargin < 3
+          % No layers specified. Simply convert all layers with
+          % same names and non-matching dimensions
+          for name = netIp.layer_names'
+              layer = netIp.layers(char(name));
+              if numel(layer.params) > 0
+                  layer2 = netConv.layers(char(name));
+                  for i = 1:numel(layer.params)
+                      if any(layer.params(i).shape ~=...
+                              layer2.params(i).shape)
+                          layersIp = [layersIp,name];
+                      end
+                  end
+              end
+          end
+          layersConv = layersIp;
+      end
       assert(numel(layersIp) == numel(layersConv),'Number of original and new layers should be equal');
       for i = 1:numel(layersIp)
         netConv.params(layersConv{i},1).set_data(reshape(...
