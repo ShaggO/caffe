@@ -301,7 +301,7 @@ static void net_forward(MEX_ARGS) {
   mxCHECK(nrhs == 1 && mxIsStruct(prhs[0]),
       "Usage: caffe_('net_forward', hNet)");
   Net<float>* net = handle_to_ptr<Net<float> >(prhs[0]);
-  net->ForwardPrefilled();
+  net->Forward();
 }
 
 // Usage: caffe_('net_backward', hNet)
@@ -387,7 +387,6 @@ static void net_test(MEX_ARGS) {
   Net<float>* net = handle_to_ptr<Net<float> >(prhs[0]);
   int iters = mxGetScalar(prhs[1]);
 
-  vector<Blob<float>* > bottom_vec;
   vector<int> test_score_output_id;
   vector<float> test_score;
   LOG(INFO) << "Full dataset test:";
@@ -395,7 +394,7 @@ static void net_test(MEX_ARGS) {
   for(int i = 0; i < iters; ++i) {
     float iter_loss = 0.0;
     const vector<Blob<float>*>& result =
-        net->Forward(bottom_vec, &iter_loss);
+        net->Forward(&iter_loss);
     loss += iter_loss;
     int idx = 0;
     for (int j = 0; j < result.size(); ++j) {
