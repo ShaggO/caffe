@@ -30,12 +30,13 @@ classdef surgery
       end
       assert(numel(layersIp) == numel(layersConv),'Number of original and new layers should be equal');
       for i = 1:numel(layersIp)
-        netConv.params(layersConv{i},1).set_data(reshape(...
-          netIp.params(layersIp{i},1).get_data(),...
-          netConv.params(layersConv{i},1).shape));
-
-        netConv.params(layersConv{i},2).set_data(...
-          netIp.params(layersIp{i},2).get_data());
+        for j = 1:numel(netConv.layers(layersConv{i}).params)
+          if numel(netConv.params(layersConv{i},j).shape) > 1 
+            netConv.params(layersConv{i},j).set_data(reshape(...
+              netIp.params(layersIp{i},j).get_data(),...
+              netConv.params(layersConv{i},j).shape));
+          end
+        end
       end
     end
   end
