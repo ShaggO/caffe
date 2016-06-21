@@ -34,7 +34,7 @@ classdef surgery
       for i = 1:numel(layersIp)
         for j = 1:numel(netConv.layers(layersConv{i}).params)
           data = netIp.params(layersIp{i},j).get_data();
-          if numel(netConv.params(layersConv{i},j).shape) > 1 
+          if numel(netConv.params(layersConv{i},j).shape) > 1
             data = reshape(data,netConv.params(layersConv{i},j).shape);
           end
           netConv.params(layersConv{i},j).set_data(data);
