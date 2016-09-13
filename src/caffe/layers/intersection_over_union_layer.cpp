@@ -52,6 +52,7 @@ void IntersectionOverUnionLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& 
 
   Dtype outer_accum = 0;
   caffe_set(nums_buffer_.count(), Dtype(0), nums_buffer_.mutable_cpu_data());
+  caffe_set(top[1]->count(), Dtype(0), top[1]->mutable_cpu_data());
 
   for (int i = 0; i < outer_num_; ++i) {
     caffe_set(nums_intersect_.count(), Dtype(0), nums_intersect_.mutable_cpu_data());
@@ -104,7 +105,9 @@ void IntersectionOverUnionLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& 
     outer_accum += inner_accum;
   }
 
+  // Do mean division by number of images (outer_num_)
   top[0]->mutable_cpu_data()[0] = outer_accum / outer_num_;
+
   // MeanIU layer should not be used as a loss function.
   if (top.size() > 1) {
     for (int i = 0; i < top[1]->count(); ++i) {
