@@ -306,7 +306,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 148 (last added: meaniu_param)
+// LayerParameter next available layer-specific ID: 148 (last added: intersectionoverunion_param)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -381,7 +381,7 @@ message LayerParameter {
   optional InfogainLossParameter infogain_loss_param = 116;
   optional InnerProductParameter inner_product_param = 117;
   optional InputParameter input_param = 143;
-  optional MeanIUParameter meaniu_param = 147;
+  optional IntersectionOverUnionParameter intersectionoverunion_param = 147;
   optional LogParameter log_param = 134;
   optional LRNParameter lrn_param = 118;
   optional MemoryDataParameter memory_data_param = 119;
@@ -476,7 +476,7 @@ message AccuracyParameter {
   optional int32 ignore_label = 3;
 }
 
-message MeanIUParameter {
+message IntersectionOverUnionParameter {
   // The "label" axis of the prediction blob, whose argmax corresponds to the
   // predicted label -- may be negative to index from the end (e.g., -1 for the
   // last axis).  For example, if axis == 1 and the predictions are
