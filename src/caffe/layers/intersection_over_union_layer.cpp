@@ -52,8 +52,10 @@ void IntersectionOverUnionLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& 
   const int num_labels = bottom[0]->shape(label_axis_);
 
   Dtype outer_accum = 0;
-  caffe_set(nums_buffer_.count(), Dtype(0), nums_buffer_.mutable_cpu_data());
-  caffe_set(top[1]->count(), Dtype(0), top[1]->mutable_cpu_data());
+  if (top.size() > 1) {
+    caffe_set(nums_buffer_.count(), Dtype(0), nums_buffer_.mutable_cpu_data());
+    caffe_set(top[1]->count(), Dtype(0), top[1]->mutable_cpu_data());
+  }
 
   for (int i = 0; i < outer_num_; ++i) {
     caffe_set(nums_intersect_.count(), Dtype(0), nums_intersect_.mutable_cpu_data());
