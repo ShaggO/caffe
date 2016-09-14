@@ -31,13 +31,14 @@ void IntersectionOverUnionLayer<Dtype>::Reshape(
       << "with integer values in {0, 1, ..., C-1}.";
   vector<int> top_shape(0);  // IoU is a scalar; 0 axes.
   top[0]->Reshape(top_shape);
+
+  // Intersect and unions are per-class vectors. 1 axis
+  vector<int> top_shape_per_class(1);
+  top_shape_per_class[0] = bottom[0]->shape(label_axis_);
+  nums_intersect_.Reshape(top_shape_per_class);
+  nums_union_.Reshape(top_shape_per_class);
   if (top.size() > 1) {
-    // Per-class IoU is a vector; 1 axes.
-    vector<int> top_shape_per_class(1);
-    top_shape_per_class[0] = bottom[0]->shape(label_axis_);
     top[1]->Reshape(top_shape_per_class);
-    nums_intersect_.Reshape(top_shape_per_class);
-    nums_union_.Reshape(top_shape_per_class);
     nums_buffer_.Reshape(top_shape_per_class);
   }
 }
@@ -94,11 +95,13 @@ void IntersectionOverUnionLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& 
         continue;
       }
       if (nums_union_.mutable_cpu_data()[j] > 0) {
-        ++nums_buffer_.mutable_cpu_data()[j];
         ++num_inner_labels;
         Dtype iou = nums_intersect_.mutable_cpu_data()[j] / nums_union_.mutable_cpu_data()[j];
         inner_accum += iou;
-        if (top.size() > 1) top[1]->mutable_cpu_data()[j] += iou;
+        if (top.size() > 1) {
+          ++nums_buffer_.mutable_cpu_data()[j];
+          top[1]->mutable_cpu_data()[j] += iou;
+        }
       }
     }
     inner_accum /= num_inner_labels;
