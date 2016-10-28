@@ -32,7 +32,7 @@ class IntersectionOverUnionLayer : public Layer<Dtype> {
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "InterSectionOverUnion"; }
+  virtual inline const char* type() const { return "IntersectionOverUnion"; }
   virtual inline int ExactNumBottomBlobs() const { return 2; }
 
   // If there are two top blobs, then the second blob will contain
