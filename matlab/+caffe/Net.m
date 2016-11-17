@@ -84,6 +84,9 @@ classdef Net < handle
     function forward_prefilled(self)
       caffe_('net_forward', self.hNet_self);
     end
+    function res = test(self, iters)
+      res = caffe_('net_test', self.hNet_self, iters);
+    end
     function backward_prefilled(self)
       caffe_('net_backward', self.hNet_self);
     end

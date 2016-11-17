@@ -13,7 +13,8 @@ namespace bp = boost::python;
 
 #include "boost/algorithm/string.hpp"
 #include "caffe/caffe.hpp"
-#include "caffe/util/signal_handler.h"
+#include "caffe/layers/memory_data_layer.hpp"
+//#include "caffe/util/signal_handler.h"
 
 using caffe::Blob;
 using caffe::Caffe;
@@ -48,6 +49,10 @@ DEFINE_string(weights, "",
     "separated by ','. Cannot be set simultaneously with snapshot.");
 DEFINE_int32(iterations, 50,
     "The number of iterations to run.");
+DEFINE_string(i, "",
+  "Optional; the location of the image to perform prediction on.");
+DEFINE_string(o, "",
+  "Optional; the location of the predicted output image.");
 DEFINE_string(sigint_effect, "stop",
              "Optional; action to take when a SIGINT signal is received: "
               "snapshot, stop or none.");
@@ -228,16 +233,16 @@ int train() {
     Caffe::set_mode(Caffe::GPU);
     Caffe::set_solver_count(gpus.size());
   }
-
+  /*
   caffe::SignalHandler signal_handler(
         GetRequestedAction(FLAGS_sigint_effect),
         GetRequestedAction(FLAGS_sighup_effect));
-
+  */
   shared_ptr<caffe::Solver<float> >
       solver(caffe::SolverRegistry<float>::CreateSolver(solver_param));
-
+  /*
   solver->SetActionFunction(signal_handler.GetActionFunction());
-
+  */
   if (FLAGS_snapshot.size()) {
     LOG(INFO) << "Resuming from " << FLAGS_snapshot;
     solver->Restore(FLAGS_snapshot.c_str());
@@ -329,6 +334,61 @@ int test() {
   return 0;
 }
 RegisterBrewFunction(test);
+
+int predict() {
+  CHECK_GT(FLAGS_model.size(), 0) << "Need a model definition.";
+  CHECK_GT(FLAGS_weights.size(), 0) << "Need model weights.";
+  CHECK_GT(FLAGS_i.size(), 0) << "Need an image to predict on.";
+  CHECK_GT(FLAGS_o.size(), 0) << "Need a location to place the predicted image.";
+
+  // Set device id and mode
+  vector<int> gpus;
+  get_gpus(&gpus);
+  if (gpus.size() != 0) {
+    LOG(INFO) << "Use GPU with device ID " << gpus[0];
+    Caffe::SetDevice(gpus[0]);
+    Caffe::set_mode(Caffe::GPU);
+  }
+  else {
+    LOG(INFO) << "Use CPU.";
+    Caffe::set_mode(Caffe::CPU);
+  }
+  // Instantiate the caffe net.
+  float loss;
+  Net<float> caffe_net(FLAGS_model, caffe::TEST);
+  caffe_net.CopyTrainedLayersFrom(FLAGS_weights);
+  LOG(INFO) << "Net initialized.";
+
+  // load image
+  caffe::Datum image;
+  caffe::ReadFileToDatum(FLAGS_i, 1, &image);
+
+  shared_ptr<caffe::MemoryDataLayer<float> > md_layer =
+    boost::dynamic_pointer_cast <caffe::MemoryDataLayer<float> >(caffe_net.layers()[0]);
+  if (!md_layer) {
+    LOG(INFO) << "The first layer is not a MemoryDataLayer!\n";
+    return -1;
+  }
+  // Temporary fix since MemoryDataLayer->AddDatumVector interprets
+  // the datum data as uint8 at read time (in the transformer)
+  // instead of a float array.
+  //image.set_channels(1);
+  //image.set_width(1920);
+  //image.set_height(1440);
+  //vector<caffe::Datum> images(1, image);
+  //md_layer->AddDatumVector(images);
+  float label[1];
+  label[0] = 1;
+  md_layer->Reset((float*)&image.data()[0], label, 1);
+
+  caffe_net.Forward(vector<Blob<float>*>(),&loss);
+  //LOG(INFO) << "loss: " << loss << "\n";
+  shared_ptr<Blob<float> > prob = caffe_net.blob_by_name("prob");
+  caffe::WriteToBinaryFile(FLAGS_o, prob->cpu_data(), prob->count());
+
+  return 0;
+}
+RegisterBrewFunction(predict);
 
 
 // Time: benchmark the execution time of a model.

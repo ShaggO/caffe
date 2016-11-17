@@ -11,6 +11,7 @@
 
 #include "caffe/common.hpp"
 #include "caffe/util/rng.hpp"
+#include <process.h>
 
 namespace caffe {
 
@@ -38,7 +39,13 @@ int64_t cluster_seedgen(void) {
   if (f)
     fclose(f);
 
-  pid = getpid();
+  // port for Win32
+  #ifndef _MSC_VER
+    pid = getpid();
+  #else
+    pid = _getpid();
+  #endif
+
   s = time(NULL);
   seed = std::abs(((s * 181) * ((pid - 83) * 359)) % 104729);
   return seed;

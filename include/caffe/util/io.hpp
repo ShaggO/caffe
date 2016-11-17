@@ -114,6 +114,7 @@ bool ReadFileToDatum(const string& filename, const int label, Datum* datum);
 inline bool ReadFileToDatum(const string& filename, Datum* datum) {
   return ReadFileToDatum(filename, -1, datum);
 }
+bool WriteToBinaryFile(const string& filename, const float* data, int number_of_floats);
 
 bool ReadImageToDatum(const string& filename, const int label,
     const int height, const int width, const bool is_color,

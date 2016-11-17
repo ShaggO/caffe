@@ -24,6 +24,12 @@
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/io.hpp"
 
+// port for win64
+#include <io.h>
+#ifdef _MSC_VER
+	#define open _open
+#endif
+
 const int kProtoReadBytesLimit = INT_MAX;  // Max size of 2 GB minus 1 byte.
 
 namespace caffe {
@@ -42,7 +48,11 @@ bool ReadProtoFromTextFile(const char* filename, Message* proto) {
   FileInputStream* input = new FileInputStream(fd);
   bool success = google::protobuf::TextFormat::Parse(input, proto);
   delete input;
-  close(fd);
+  #ifdef _MSC_VER
+    _close(fd);
+  #else
+    close(fd);
+  #endif
   return success;
 }
 
@@ -51,7 +61,11 @@ void WriteProtoToTextFile(const Message& proto, const char* filename) {
   FileOutputStream* output = new FileOutputStream(fd);
   CHECK(google::protobuf::TextFormat::Print(proto, output));
   delete output;
-  close(fd);
+  #ifdef _MSC_VER
+    _close(fd);
+  #else
+    close(fd);
+  #endif
 }
 
 bool ReadProtoFromBinaryFile(const char* filename, Message* proto) {
@@ -69,7 +83,11 @@ bool ReadProtoFromBinaryFile(const char* filename, Message* proto) {
 
   delete coded_input;
   delete raw_input;
-  close(fd);
+  #ifdef _MSC_VER
+    _close(fd);
+  #else
+    close(fd);
+  #endif
   return success;
 }
 
@@ -164,11 +182,23 @@ bool ReadFileToDatum(const string& filename, const int label,
     file.close();
     datum->set_data(buffer);
     datum->set_label(label);
-    datum->set_encoded(true);
+    #ifdef USE_OPENCV
+      datum->set_encoded(true);
+    #endif
     return true;
   } else {
     return false;
   }
+}
+
+bool WriteToBinaryFile(const string& filename, const float* data, int number_of_floats) {
+  fstream output_file(filename.c_str(), ios::out|ios::binary);
+  if (output_file.is_open()) {
+    output_file.write((char*)data, sizeof(float)*number_of_floats);
+    output_file.close();
+    return true;
+  }
+  return false;
 }
 
 #ifdef USE_OPENCV
