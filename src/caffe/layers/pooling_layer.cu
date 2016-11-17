@@ -113,11 +113,10 @@ __global__ void StoPoolForwardTrain(const int nthreads,
         if (cumsum >= thres) {
           rand_idx[index] = ((n * channels + c) * height + h) * width + w;
           top_data[index] = bottom_slice[h * width + w];
-          goto nextKernel;
+	  return;
         }
       }
     }
-    nextKernel: {}
   }
 }
 
