@@ -167,12 +167,8 @@ class Caffe {
   inline static bool root_solver() { return Get().root_solver_; }
   inline static void set_root_solver(bool val) { Get().root_solver_ = val; }
   // Sets the log
-  static void SetLogfile(const char* file) {
-    ::google::SetLogDestination(google::INFO, file);
-  }
-  static void InitLogging() {
-    ::google::InitGoogleLogging("");
-  }
+  static void SetLogfile(const char* file);
+  static void InitLogging();
 
  protected:
 #ifndef CPU_ONLY

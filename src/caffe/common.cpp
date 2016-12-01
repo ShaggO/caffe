@@ -89,6 +89,14 @@ int Caffe::FindDevice(const int start_id) {
   return -1;
 }
 
+static void SetLogfile(const char* file) {
+  ::google::SetLogDestination(INFO, file);
+}
+
+static void InitLogging() {
+  ::google::InitGoogleLogging("");
+}
+
 class Caffe::RNG::Generator {
  public:
   Generator() : rng_(new caffe::rng_t(cluster_seedgen())) {}
