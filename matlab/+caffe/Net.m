@@ -47,7 +47,7 @@ classdef Net < handle
       
       % setup blob_vec
       self.blob_vec = caffe.Blob.empty();
-      for n = 1:length(self.attributes.hBlob_blobs);
+      for n = 1:length(self.attributes.hBlob_blobs)
         self.blob_vec(n) = caffe.Blob(self.attributes.hBlob_blobs(n));
       end
       
