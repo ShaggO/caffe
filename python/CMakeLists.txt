@@ -3,16 +3,16 @@ if(NOT HAVE_PYTHON)
   return()
 endif()
 
-include_directories(${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
 file(GLOB_RECURSE python_srcs ${PROJECT_SOURCE_DIR}/python/*.cpp)
 
 add_library(pycaffe MODULE ${python_srcs})
-target_link_libraries(pycaffe ${Caffe_LINK} ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
+caffe_default_properties(pycaffe)
 set_target_properties(pycaffe PROPERTIES PREFIX "" OUTPUT_NAME "_caffe")
 if(MSVC)
   set_target_properties(pycaffe PROPERTIES SUFFIX ".pyd")
 endif()
-caffe_default_properties(pycaffe)
+target_include_directories(pycaffe PUBLIC ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR})
+target_link_libraries(pycaffe PUBLIC ${Caffe_LINK} ${PYTHON_LIBRARIES})
 
 if(UNIX OR APPLE)
     set(__linkname "${PROJECT_SOURCE_DIR}/python/caffe/_caffe.so")
@@ -27,8 +27,12 @@ elseif(WIN32)
                        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:pycaffe> ${PROJECT_SOURCE_DIR}/python/caffe
                        COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/python/caffe/proto
                        COMMAND ${CMAKE_COMMAND} -E touch ${PROJECT_SOURCE_DIR}/python/caffe/proto/__init__.py
-                       COMMAND (robocopy  "\"${proto_gen_folder}\" \"${PROJECT_SOURCE_DIR}/python/caffe/proto\" *.py") ^& IF %ERRORLEVEL% LEQ 4 exit /B 0
+                       COMMAND (robocopy  "\"${proto_gen_folder}\" \"${PROJECT_SOURCE_DIR}/python/caffe/proto\" *.py") ^& IF %ERRORLEVEL% LEQ 4 set ERRORLEVEL=0
                        COMMENT "Creating symlink ${__linkname} -> ${PROJECT_BINARY_DIR}/lib/_caffe.pyd")
+endif()
+
+if(MSVC AND COPY_PREREQUISITES)
+  caffe_copy_prerequisites(pycaffe DESTINATION ${PROJECT_SOURCE_DIR}/python/caffe USE_HARD_LINKS)
 endif()
 
 # ---[ Install
@@ -47,4 +51,9 @@ install(DIRECTORY caffe
 
 # _caffe.so
 install(TARGETS pycaffe  DESTINATION python/caffe)
+
+if(MSVC AND INSTALL_PREREQUISITES)
+  caffe_install_prerequisites(pycaffe DESTINATION python/caffe)
+endif()
+
 

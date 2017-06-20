@@ -3,9 +3,12 @@ file(GLOB proto_files proto/*.proto)
 caffe_protobuf_generate_cpp_py(${proto_gen_folder} proto_srcs proto_hdrs proto_python ${proto_files})
 
 # include python files either to force generation
-add_library(proto STATIC ${proto_hdrs} ${proto_srcs} ${proto_python})
-set(Caffe_LINKER_LIBS proto ${Caffe_LINKER_LIBS}) # note, crucial to prepend!
-caffe_default_properties(proto)
+add_library(caffeproto STATIC ${proto_hdrs} ${proto_srcs} ${proto_python})
+caffe_default_properties(caffeproto)
+target_link_libraries(caffeproto PUBLIC ${PROTOBUF_LIBRARIES})
+target_include_directories(caffeproto PUBLIC ${PROTOBUF_INCLUDE_DIR})
+
+list(INSERT Caffe_LINKER_LIBS 0 PUBLIC caffeproto) # note, crucial to prepend!
 
 # --[ Caffe library
 
@@ -51,8 +54,16 @@ if(HAVE_CUDA)
 endif()
 
 add_library(caffe ${srcs})
-target_link_libraries(caffe proto ${Caffe_LINKER_LIBS})
 caffe_default_properties(caffe)
+target_link_libraries(caffe ${Caffe_LINKER_LIBS})
+target_include_directories(caffe ${Caffe_INCLUDE_DIRS}
+                                 PUBLIC
+                                 $<BUILD_INTERFACE:${Caffe_INCLUDE_DIR}>
+                                 $<INSTALL_INTERFACE:include>)
+target_compile_definitions(caffe ${Caffe_DEFINITIONS})
+if(Caffe_COMPILE_OPTIONS)
+  target_compile_options(caffe ${Caffe_COMPILE_OPTIONS})
+endif()
 set_target_properties(caffe PROPERTIES
     VERSION   ${CAFFE_TARGET_VERSION}
     SOVERSION ${CAFFE_TARGET_SOVERSION}
@@ -79,6 +90,9 @@ if(MSVC)
   # Disable Boost autolinking for consuming projects
   target_compile_definitions(caffe PUBLIC -DBOOST_ALL_NO_LIB)
 endif()
+if(MSVC AND USE_NCCL)
+  add_dependencies(caffe nccl)
+endif()
 
 configure_file(${caffe_export_hdr_in} ${caffe_export_hdr})
 
@@ -86,15 +100,14 @@ configure_file(${caffe_export_hdr_in} ${caffe_export_hdr})
  add_subdirectory(test)
 
 # ---[ Install
-install(DIRECTORY ${Caffe_INCLUDE_DIR}/caffe DESTINATION include)
-install(FILES ${proto_hdrs} DESTINATION include/caffe/proto)
-install(TARGETS caffe proto EXPORT CaffeTargets DESTINATION lib)
+install(DIRECTORY ${Caffe_INCLUDE_DIR}/caffe DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES ${proto_hdrs} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/caffe/proto)
+install(TARGETS caffe caffeproto EXPORT CaffeTargets DESTINATION ${CMAKE_INSTALL_LIBDIR})
 if(MSVC AND NOT BUILD_SHARED_LIBS)
-  install(FILES ${caffe_export_hdr} ${caffe_symbols_hdr} DESTINATION include/caffe)
+  install(FILES ${caffe_export_hdr} ${caffe_symbols_hdr} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/caffe)
 endif()
 
 file(WRITE ${PROJECT_BINARY_DIR}/__init__.py)
 list(APPEND proto_python ${PROJECT_BINARY_DIR}/__init__.py)
 install(PROGRAMS ${proto_python} DESTINATION python/caffe/proto)
-
 
