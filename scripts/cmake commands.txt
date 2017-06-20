@@ -6,7 +6,7 @@ set CAFFE_DEPENDENCIES=..\libraries
 mkdir build
 cd build
 
-cmake -G%CMAKE_GENERATOR% -DBLAS=Open -DCMAKE_BUILD_TYPE=%CMAKE_CONFIGURATION% -DBUILD_SHARED_LIBS=ON -DBUILD_python=OFF -DBUILD_python_layer=OFF -DUSE_OPENCV=OFF -DCUDA_ARCH_NAME="Manual" -DCUDNN_ROOT="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v8.0" -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v8.0" -C %CAFFE_DEPENDENCIES%\caffe-builder-config.cmake ..\
+cmake -G%CMAKE_GENERATOR% -DBLAS=Open -DCMAKE_BUILD_TYPE=%CMAKE_CONFIGURATION% -DBUILD_SHARED_LIBS=ON -DBUILD_python=OFF -DUSE_LEVELDB=OFF -DUSE_LMDB=OFF -DBUILD_python_layer=OFF -DUSE_OPENCV=OFF -DCUDA_ARCH_NAME="Manual" -DCUDNN_ROOT="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v8.0" -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v8.0" -C %CAFFE_DEPENDENCIES%\caffe-builder-config.cmake ..\
 
 cmake --build . --config %CMAKE_CONFIGURATION%
 cmake --build . --config %CMAKE_CONFIGURATION% --target install
